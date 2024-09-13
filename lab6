@@ -1,0 +1,62 @@
+#include <Arduino.h>
+#include <LiquidCrystal_I2C.h>
+#define I2C_SDA 23
+#define I2C_SCL 22
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+const int p1 =  4; 
+const int p2 = 5; 
+const int aum = 17; 
+const int decr = 18; 
+int contador = 0;
+
+void setup() {
+  lcd.init(I2C_SDA, I2C_SCL);
+  lcd.begin(16, 2); 
+  lcd.backlight(); 
+  lcd.clear();
+  pinMode(p1, INPUT);
+  pinMode(p2, INPUT);
+  pinMode(aum, INPUT_PULLUP);
+  pinMode(decr, INPUT_PULLUP);
+} 
+
+void loop() {
+  
+  int analog_1 = analogRead(p1);
+  int analog_2 = analogRead(p2);
+  
+  float med_1 = analog_1 * (3.3 / 4095.0); 
+  float med_2 = analog_2 * (3.3 / 4095.0); 
+  
+
+  int boton1 = digitalRead(aum);
+  int boton2 = digitalRead(decr);
+
+  if (boton1 == LOW) {
+    contador++;
+    if (contador > 255) contador = 255; 
+    delay(200); 
+  }
+  
+  if (boton2 == LOW) {
+    contador--;
+    if (contador < 0) contador = 0; 
+    delay(200); 
+  }
+  
+  // Mostrar datos en el LCD
+  
+  lcd.setCursor(0, 0);
+  lcd.print("V1:");
+  lcd.print(med_1, 2); 
+  lcd.print(" V2:");
+  lcd.print(med_2, 2); 
+  
+  lcd.setCursor(0, 1);
+  lcd.print("Contador:");
+  lcd.print(contador);
+  
+  delay(10); 
+}
